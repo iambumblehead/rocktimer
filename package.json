@@ -1,0 +1,21 @@
+{
+  "name": "rocktimer",
+  "version": "0.0.1",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/iambumblehead/rocktimer.git"
+  },
+  "keywords": [
+    "timer",
+    "session"
+  ],
+  "devDependencies" : {
+      "jasmine-node" : ">=1.3.0",
+      "compareobj" : ">=0.0.1"
+  },
+  "scripts" : {
+      "test" : "node node_modules/jasmine-node/bin/jasmine-node --verbose test/"
+  },    
+  "readmeFilename": "README.md",
+  "description": "A timer. Add callbacks to the finish event. Easily start/stop and extend the time."
+}
