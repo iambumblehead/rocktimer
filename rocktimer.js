@@ -1,5 +1,5 @@
 // Filename: rocktimer.js
-// Timestamp: 2013.09.06-16:17:23 (last modified)  
+// Timestamp: 2013.09.06-18:41:46 (last modified)  
 // Author(s): Bumblehead (www.bumblehead.com)
 // Requires:
 
@@ -11,13 +11,13 @@ var rocktimer =
     bgnTime : null,
     endTime : null,
     interval : null,
-    atCompleteFunArr : [],
+    atCompleteFnArr : [],
     
     atCompleteFnArrInit : function (bgnDate, endDate) {
-      var fnArr = this.atCompleteFunArr, x;
+      var fnArr = this.atCompleteFnArr, x;
 
       for (x = fnArr.length; x--;) {
-        fnArr(bgnDate, endDate);
+        fnArr[x](bgnDate, endDate);
       }
     },
 
@@ -26,7 +26,7 @@ var rocktimer =
           endTime = this.endTime;
 
       if (Date.now() > endTime.getTime()) {
-        window.clearInterval(that.interval);
+        clearInterval(that.interval);
         that.atCompleteFnArrInit(endTime, new Date());
         this.endTime = null;
       }
@@ -44,15 +44,13 @@ var rocktimer =
     //   ss : 0, // seconds
     //   ms : 0  // milliseconds
     // }
-    getFromDate : function (opts, date) {
-      var time = date.getTime();
-
+    getms : function (opts, date) {
+      var ms = 0;
       if (typeof opts.hh === 'number') time += opts.hh * 60 * 60 * 1000;
       if (typeof opts.mm === 'number') time += opts.mm * 60 * 1000;
       if (typeof opts.ss === 'number') time += opts.ss * 1000;
       if (typeof opts.ms === 'number') time += opts.ms;
-      
-      return new Date(time);
+      return ms;
     },
 
     getFromDateNow : function (opts) {
@@ -75,9 +73,11 @@ var rocktimer =
       that.endTime = that.getFromDate(opts);
 
       if (typeof fn === 'function') {
-        that.atCompleteFunArr.push(fn);
+        that.atCompleteFnArr.push(fn);
       }
 
+      that.timer = window.setInterval
+      
       that.interval = window.setInterval(function () { that.checkTimer(); }, 1000);
 
       return that;
@@ -86,9 +86,9 @@ var rocktimer =
 
   return {
     prototype : timer,
-    get : function (spec) {
+    getNew : function () {
       var that = Object.create(timer);
-      that.atCompleteFunArr = [];
+      that.atCompleteFnArr = [];
       that.bgnTime = null;
       that.endTime = null;
       that.interval = null;
