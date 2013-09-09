@@ -1,5 +1,5 @@
 // Filename: rocktimer.js
-// Timestamp: 2013.09.06-18:41:46 (last modified)  
+// Timestamp: 2013.09.08-16:01:31 (last modified)  
 // Author(s): Bumblehead (www.bumblehead.com)
 // Requires:
 
@@ -21,6 +21,7 @@ var rocktimer =
       }
     },
 
+    /*
     checkTimer : function () {
       var that = this, 
           endTime = this.endTime;
@@ -37,6 +38,7 @@ var rocktimer =
 
       that.endTime = that.getFromDate(opts);
     },
+     */
     
     // {
     //   hh : 0, // hours
@@ -44,12 +46,12 @@ var rocktimer =
     //   ss : 0, // seconds
     //   ms : 0  // milliseconds
     // }
-    getms : function (opts, date) {
+    getms : function (opts) {
       var ms = 0;
-      if (typeof opts.hh === 'number') time += opts.hh * 60 * 60 * 1000;
-      if (typeof opts.mm === 'number') time += opts.mm * 60 * 1000;
-      if (typeof opts.ss === 'number') time += opts.ss * 1000;
-      if (typeof opts.ms === 'number') time += opts.ms;
+      if (typeof opts.hh === 'number') ms += opts.hh * 60 * 60 * 1000;
+      if (typeof opts.mm === 'number') ms += opts.mm * 60 * 1000;
+      if (typeof opts.ss === 'number') ms += opts.ss * 1000;
+      if (typeof opts.ms === 'number') ms += opts.ms;
       return ms;
     },
 
@@ -66,22 +68,28 @@ var rocktimer =
     //   ss : 0, // seconds
     //   ms : 0  // milliseconds
     // }
-    begin : function (opts, fn) {
+    start : function (opts, fn) {
       var that = this;
 
+      that.ms = that.getms(opts);
       that.bgnTime = new Date();
-      that.endTime = that.getFromDate(opts);
+      that.endTime = new Date(that.bgnTime.getTime() + that.ms);
+      //that.endTime = that.getFromDate(opts);
 
       if (typeof fn === 'function') {
         that.atCompleteFnArr.push(fn);
       }
 
-      that.timer = window.setInterval
+      that.timer = setTimeout(function () {
+        that.atCompleteFnArrInit(that.endTime, new Date());
+      }, that.ms);
       
-      that.interval = window.setInterval(function () { that.checkTimer(); }, 1000);
-
       return that;
-    }
+    },
+
+    stop : function () {},
+    reset : function () {},
+    extend : function () {}
   };
 
   return {
