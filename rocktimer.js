@@ -1,5 +1,5 @@
 // Filename: rocktimer.js
-// Timestamp: 2013.09.09-18:28:50 (last modified)  
+// Timestamp: 2013.09.09-20:52:26 (last modified)  
 // Author(s): Bumblehead (www.bumblehead.com)
 // Requires:
 
@@ -32,8 +32,11 @@ var rocktimer =
     getms : function (opts) {
       var ms = 0;
       if (typeof opts === 'object' && opts) {
-        if (typeof opts.hh === 'number') ms += opts.hh * 60 * 60 * 1000;
-        if (typeof opts.mm === 'number') ms += opts.mm * 60 * 1000;
+        // 1000 * 60 * 60
+        if (typeof opts.hh === 'number') ms += opts.hh * 3600000;
+        // 1000 * 60
+        if (typeof opts.mm === 'number') ms += opts.mm * 60000;
+        // 1000
         if (typeof opts.ss === 'number') ms += opts.ss * 1000;
         if (typeof opts.ms === 'number') ms += opts.ms;
       }
