@@ -4,7 +4,7 @@ var rocktimer = require('../rocktimer'),
 
 describe("rocktimer.getNew", function () {
 
-  it("should return an object with top-level properties atCompleteFnArr, bgnTime, endTime and interval", function () {
+  it("should return an object with top-level properties atCompleteFnArr, bgnTime, endTime and timer", function () {
     var rocktimerObj = rocktimer.getNew();
 
     // compare obj not yet ready to compare properties defined as array
@@ -12,11 +12,10 @@ describe("rocktimer.getNew", function () {
       compareobj.isSameMembersDefinedObj({    
         bgnTime : null,
         endTime : null,
-        interval : null
+        timer : null
       }, rocktimerObj)
     ).toBe( true );
   });
-
 });
 
 
@@ -63,17 +62,18 @@ describe("rocktimerObj.getms", function () {
 
 });
 
+
 describe("rocktimerObj.start", function () {
 
   it("should start a timer (time values defined and callback called)", function (done) {
-    var rocktimerObj = rocktimer.getNew(), x = 0;    
-
-    rocktimerObj.start({
+    var rocktimerObj = rocktimer.getNew({
       hh : 0,
       mm : 0,
       ss : 1,
       ms : 100
-    }, function () {
+    }), x = 0;    
+
+    rocktimerObj.start(function () {
       x++;
     });
 
@@ -92,19 +92,18 @@ describe("rocktimerObj.start", function () {
   });
 
   it("should start a timer that completes ~at the specified time", function (done) {
-    var rocktimerObj = rocktimer.getNew(), bgnTime, endTime;    
-
-    bgnTime = new Date(Date.now() + 1100);
-
-    rocktimerObj.start({
+    var rocktimerObj = rocktimer.getNew({
       hh : 0,
       mm : 0,
       ss : 1,
       ms : 100
-    }, function () {
+    }), bgnTime, endTime;    
+
+    bgnTime = new Date(Date.now() + 1090);
+
+    rocktimerObj.start(function () {
       var now = Date.now();
 
-      console.log(bgnTime.getTime(), now, endTime.getTime());
       expect( 
         (bgnTime.getTime() < now) &&
         (endTime.getTime() > now)
@@ -112,9 +111,226 @@ describe("rocktimerObj.start", function () {
       done();
     });
 
-    endTime = new Date(Date.now() + 1100);
+    endTime = new Date(Date.now() + 1110);
       
+  });
+
+  it("should start a timer that has been stopped", function (done) {
+    var rocktimerObj = rocktimer.getNew({
+      hh : 0,
+      mm : 0,
+      ss : 1,
+      ms : 100
+    }), bgnTime, endTime, x = 0;
+
+    rocktimerObj.start(function () {
+      x++;
+    }); 
+    
+    rocktimerObj.stop();
+
+    setTimeout(function () {
+      rocktimerObj.start();
+    }, 1000);
+
+    setTimeout(function () {
+       expect( x ).toBe( 1 );
+       done();
+    }, 2200);
+    
+  });
+
+  it("should start a timer that has been stopped and timer should not end prematurely", function (done) {
+    var rocktimerObj = rocktimer.getNew({
+      hh : 0,
+      mm : 0,
+      ss : 1,
+      ms : 100
+    }), bgnTime, endTime, x = 0;
+
+    rocktimerObj.start(function () {
+      x++;
+    }); 
+    
+    rocktimerObj.stop();
+
+    setTimeout(function () {
+      rocktimerObj.start();
+    }, 1000);
+
+    setTimeout(function () {
+       expect( x ).toBe( 0 );
+       done();
+    }, 1000);
+    
   });
 
 });
 
+
+describe("rocktimerObj.stop", function () {
+  it("should set the timeout property to null", function () {
+    var rocktimerObj = rocktimer.getNew({
+      hh : 0,
+      mm : 0,
+      ss : 1,
+      ms : 100
+    }), x = 0;    
+
+    rocktimerObj.start(); 
+    rocktimerObj.stop(); 
+
+    expect( rocktimerObj.timer ).toBe( null );    
+  });
+
+  it("should prevent any callbacks from being called", function (done) {
+    var rocktimerObj = rocktimer.getNew({
+      hh : 0,
+      mm : 0,
+      ss : 1,
+      ms : 100
+    }), x = 0;    
+
+    rocktimerObj.start(function () {
+      x++;
+    }); 
+
+    rocktimerObj.stop(); 
+
+    setTimeout(function () {
+      expect( x ).toBe( 0 );          
+      done();
+    }, 1200);
+  });
+
+});
+
+describe("rocktimerObj.clear", function () {
+  it("should clear all timer properties", function () {
+    var rocktimerObj = rocktimer.getNew({
+      hh : 0,
+      mm : 0,
+      ss : 1,
+      ms : 100
+    });    
+
+    rocktimerObj.start(); 
+    rocktimerObj.clear();
+
+    expect(
+      compareobj.isSameMembersDefinedObj({    
+        bgnTime : null,
+        endTime : null,
+        timer : null,
+        remainingms : 0
+      }, rocktimerObj)
+    ).toBe( true );
+
+  });
+});
+
+
+describe("rocktimerObj.reset", function () {
+  it("should reset a timer, callback should not be called before timer end", function (done) {
+    var rocktimerObj = rocktimer.getNew({
+      hh : 0,
+      mm : 0,
+      ss : 1,
+      ms : 100
+    }), x = 0;
+
+    rocktimerObj.start(function () {
+      x++;
+    }); 
+
+    rocktimerObj.stop();
+
+    setTimeout(function () {
+      rocktimerObj.reset();
+    }, 1000);
+
+    setTimeout(function () {
+       expect( x ).toBe( 0 );
+       done();
+    }, 2000);
+    
+  });
+
+
+  it("should reset a timer, callback should be called at timer end", function (done) {
+    var rocktimerObj = rocktimer.getNew({
+      hh : 0,
+      mm : 0,
+      ss : 1,
+      ms : 100
+    }), x = 0;
+
+    rocktimerObj.start(function () {
+      x++;
+    }); 
+
+    rocktimerObj.stop();
+
+    setTimeout(function () {
+      rocktimerObj.reset();
+    }, 1000);
+
+
+    setTimeout(function () {
+       expect( x ).toBe( 1 );
+       done();
+    }, 2300);
+    
+  });
+
+});
+
+describe("rocktimerObj.extend", function () {
+  it("should extend the time on the timer, callback should not be called before timer end", function (done) {
+    var rocktimerObj = rocktimer.getNew({
+      hh : 0,
+      mm : 0,
+      ss : 1,
+      ms : 100
+    }), x = 0;
+
+
+    rocktimerObj.start(function () {
+      x++;
+    }); 
+
+    rocktimerObj.extend({
+      ms : 1000
+    });
+
+    setTimeout(function () {
+       expect( x ).toBe( 0 );
+       done();
+    }, 2000);    
+  });
+
+
+  it("should extend the time on the timer, callback should not be called after timer end", function (done) {
+    var rocktimerObj = rocktimer.getNew({
+      hh : 0,
+      mm : 0,
+      ss : 1,
+      ms : 100
+    }), x = 0;
+
+
+    rocktimerObj.start(function () {
+      x++;
+    }); 
+
+    rocktimerObj.extend({
+      ms : 1000
+    });
+
+    setTimeout(function () {
+       expect( x ).toBe( 1 );
+       done();
+    }, 2400);    
+  });
+
+});
