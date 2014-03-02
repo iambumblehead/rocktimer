@@ -4,14 +4,89 @@ rocktimer
 
 ### OVERVIEW:
 
-A timer. Some useful things:
-  - easily start, stop, clear, reset and extend the timer.
-  - add callbacks to the timer -called when the timer completes.
-  - defines time using milliseconds and timestamps.
-  - extensible.
+`rocktimer` is for implementing things such as, **countdowns**, **stopwatches**, and **session expirations**. Reliably _start_, _stop_, _clear_, _reset_ and _extend_ the timer. Add functions called during those events and during time intervals you define.
+
+`rocktimer` uses unicode formatted time descriptors.
+
+A demo timer/countdown application is included in the tests. To build the test document, Use `npm start`:
+
+ ![screenshot][1]
+
+ * **Easy (constructor used by demo app)**: 
+   ```
+   return rocktimer({
+       hh : 0,
+       mm : 5,
+       ss : 2,
+       ms : 100
+   }).forEach({ mm : 1 }, function (rt, ms) {
+       that.setLabelMin(ms.asmm());
+   }).forEach({ ss : 1 }, function (rt, ms) {
+       that.setLabelSec(ms.asss());
+   }).forEach({ ms : 100 }, function (rt, ms) {
+       that.setLabelCountdown(ms.remaining.asss());
+       that.setLabelMs(ms);
+   }).onStart(function (rt, ms) {
+       that.setLabelMin(ms.asmm());
+       that.setLabelSec(ms.asss());
+       that.setLabelMs(ms);
+       that.setLabelCountdown(ms.remaining.asss());
+       that.setLabelStatus('Start.');
+   }).onStop(function (rt, ms) {
+       console.log('stop');
+       that.setLabelStatus('Stop, time remaining (ms): ' + ms.remaining);
+   }).onExtend(function (rt, ms) {
+       that.setLabelCountdown(ms.remaining.asss());
+       that.setLabelStatus('Extended, time remaining (ms): ' + ms.mstotal);
+   }).onClear(function (rt, ms) {
+       that.setLabelMin(ms.asmm());
+       that.setLabelSec(ms.asss());
+       that.setLabelMs(ms);
+       that.setLabelCountdown(ms.remaining.asss());
+       that.setLabelStatus('Clear.');
+   });   
+   ```
+   
+ * **Accurate _Enough_?**:
+ 
+   Accuracy of a scripted timer is limited by the host environment. `rocktimer` does not adjust itself for scenarious that reduce accuracy. When preprocessing is handled on 'start', actual start time is less accurate. When multiple functions are bound to a time interval, they are called in sequence allowing small time differences. Rocktimer is accurate enough only.
+
+
+`rocktimer` **does not** use a popular library like jQuery. Its minified size is ~4.8kb. All methods are public and may be redefined as needed.
+
+**The `forEach` method and event hooks are what make `rocktimer` really useful.**
+
+```javascript
+var rock = rocktimer({
+    hh : 0,
+    mm : 0,
+    ss : 1,
+    ms : 100
+}).forEach({ mm : 1 }, function (rt, ms) {
+   // every 1 minut
+}).forEach({ mm : 2 }, function (rt, ms) {
+   // every 2 minues
+}).forEach({ ss : 1 }, function (rt, ms) {
+   // every 1 second
+}).forEach({ hh : 100 }, function (rt, ms) {       
+   // every 100 hours
+}).onStart(function (rt, ms) {
+   // timer is started
+}).onStop(function (rt, ms) {   
+   // timer is stopped
+}).onExtend(function (rt, ms) {
+   // timer is extended
+}).onClear(function (rt, ms) {   
+   // timer is cleared
+}).start();
+```
+ 
+Unlimited time intervals and event hooks may be added. Overlapping intervals are handled with rock stability. A brevity of syntax needed means less overhead for managing part of your application that using rocktimer.
+
 
 
 [0]: http://www.bumblehead.com                            "bumblehead"
+[1]: https://github.com/iambumblehead/rocktimer/raw/master/img/screenshot-timer.png
 
 ---------------------------------------------------------
 #### <a id="install"></a>INSTALL:
@@ -28,75 +103,73 @@ rocktimer may be downloaded directly or installed through `npm`.
  
  ```bash  
  $ git clone https://github.com/iambumblehead/rocktimer.git
+ $ cd rocktimer && npm install
+ ```
+ 
+This repository contains two ready-to-use files, [rocktimer.min.js][23] and [rocktimer.unmin.js][24].
+
+Run npm start to build a sample rocktimer page. 
+
+[23]: http://github.com/iambumblehead/rocktimer/raw/master/rocktimer.min.js
+[24]: http://github.com/iambumblehead/rocktimer/raw/master/rocktimer.unmin.js
+
+
+---------------------------------------------------------
+#### <a id="test"></a>Test:
+
+ to run tests, use `npm test` from a shell.
+
+ ```bash
+ $ npm test
  ```
 
 ---------------------------------------------------------
 #### <a id="usage">USAGE:
 
- 1. Create a timer.
+Create a timer. Start it. Stop it.
 
  ```javascript
- rocktimer = require('rocktimer');
- var rocktimerObj = rocktimer.getNew({
+ rocktimer({
    hh : 0,
    mm : 0,
    ss : 1,
    ms : 100
- });
- ```
-
- 2. Start the timer.
-
- ```javascript
- rocktimer.start(function () { console.log('finished'); });
- ```
-
- 2. Stop the timer.
-
- ```javascript
- rocktimer.stop();
+ }).start().stop();
  ```
 
 ---------------------------------------------------------
 #### <a id="methods">METHODS:
 
 
-
- - **rocktimer.getNew ( _timeOpts_ )**  
-   returns a new and unstarted timer object. timeOpts should be an object with property-names corresponding to unicode time values.
-
-   get a timer object with time set to 1 hour and 20 minutes:
+ - **rocktimer ( _timeOpts_ )**  
+   returns a timer object. timeOpts should be an object with property-names corresponding to unicode time values.
 
    ```javascript
-   var rocktimerObj = rocktimer.getNew({
-       hh : 0,
-       mm : 0,
-       ss : 1,
-       ms : 100
+   var rocktimerObj = rocktimer({
+       hh : 1,  // 1 hour
+       mm : 0,  // 0 minutes
+       ss : 1,  // 1 second
+       ms : 100 // 100 milliseconds
    });   
    ```
 
  - **rocktimer.prototype**
-   prototype is not a method but a property defined on the `rocktimer` namespace. the prototype is used by `rocktimer` to construct its own timer object. prototype may be accessed to redefine its default properties. for example, you may want to redefine the `stop` method to enable callback calls when that method is called,
-
-   start, stop, clear, reset, extent, isActive, getremainingms
+   prototype is not a method but a property defined on the `rocktimer` namespace. the prototype is used by `rocktimer` to construct its own timer object. prototype may be accessed to redefine its default properties. Methods on the prototype include `start`, `stop`, `clear`, `reset`, `extend`, `isActive`, `getremainingms`.
 
 
  - **rocktimer.prototype.start ( _fn_ )**
 
-   starts the timer. the first argument is an optional callback.
+   starts the timer.
 
    ```javascript
-   var timer = rocktimer.getNew({
+   rocktimer({
        hh : 0,
        mm : 0,
        ss : 1,
        ms : 100
-   });
-   
-   timer.start(function () {
-       console.log('timer is completed after 1100 milliseconds');
-   });
+   }).onStart(function () {
+       console.log('timer will complete after 1100 milliseconds');   
+   }).start();
    ```
 
  - **rocktimer.prototype.stop ( )**
@@ -104,60 +177,32 @@ rocktimer may be downloaded directly or installed through `npm`.
    stops the timer.
 
    ```javascript
-   var timer = rocktimer.getNew({
+   rocktimer({
        hh : 0,
        mm : 0,
        ss : 1,
        ms : 100
-   });
-   
-   timer.start(function () {
-       console.log('timer is completed after 1100 milliseconds');
-   });
-   
-   timer.stop();
+   }).onStop(function () {
+       console.log('timer is stopped');   
+   }).start().stop();
    ```
 
  - **rocktimer.prototype.clear ( )**
 
-   stop the timer and reset values. if the timer was created for 5 minutes, the timer will have 5 minutes remaining when it is started again.
+   Reset values. If timer was created for 5 minutes, timer will have 5 minutes remaining after reset().
 
    ```javascript
-   var timer = rocktimer.getNew({
+   var rock = rocktimer({
        hh : 0,
        mm : 0,
        ss : 1,
        ms : 100
-   });
-   
-   timer.start(function () {
+   }).onStop(function () {
        console.log('~2100 milliseconds have passed');
-   });
+   }).start();
    
    setTimeout(function () {
-       timer.clear();
-       timer.start();
-   }, 1000)   
-   ```
-
- - **rocktimer.prototype.reset ( )**
-
-   convenience method that calls clear() followed by start(). useful if the timer is used for a browser session -each time a link is clicked, timer resets and session time is renewed.
-
-   ```javascript
-   var timer = rocktimer.getNew({
-       hh : 0,
-       mm : 0,
-       ss : 1,
-       ms : 100
-   });
-   
-   timer.start(function () {
-       console.log('~2100 milliseconds have passed');
-   });
-   
-   setTimeout(function () {
-       timer.reset();
+       rock.clear();
    }, 1000)   
    ```
 
@@ -166,18 +211,14 @@ rocktimer may be downloaded directly or installed through `npm`.
    add more time to the timer.
 
    ```javascript
-   var timer = rocktimer.getNew({
+   rocktimer({
        hh : 0,
        mm : 0,
        ss : 1,
        ms : 100
-   });
-   
-   timer.start(function () {
+   }).onStop(function () {
        console.log('~2100 milliseconds have passed');
-   });
-   
-   timer.extend({
+   }).start().extend({
        ms : 1000
    });
    ```
@@ -187,38 +228,61 @@ rocktimer may be downloaded directly or installed through `npm`.
    is the timer active?
 
    ```javascript
-   var timer = rocktimer.getNew({
+   rocktimer({
        hh : 0,
        mm : 0,
        ss : 1,
        ms : 100
-   });
-   
-   timer.start();
-   console.log(timer.isActive); // true
-   timer.stop();
-   console.log(timer.isActive); // false
+   }).start().isActive()   // true
+       .stop().isActive(); // false
    ```
 
  - **rocktimer.prototype.getramainingms ( )**
 
    ```javascript
-   var timer = rocktimer.getNew({
+   var rock = rocktimer({
        hh : 0,
        mm : 0,
        ss : 1,
        ms : 100
+   }).forEach({ ss : 1 }, function () {
+       console.log(rock.getremainingms()); // 0, 1
    }).start();
-   
-   setTimeout(function () {
-       console.log(timer.getremainingms()); // 600
-   }, 500);
    ```
+   
+ - **rocktimer.prototype.forEach ( )** _and event hooks_   
+ 
+   The `forEach` method and event hooks are what make `rocktimer` really useful.
 
+   ```javascript
+   var rock = rocktimer({
+       hh : 0,
+       mm : 0,
+       ss : 1,
+       ms : 100
+   }).forEach({ mm : 1 }, function (rt, ms) {
+      // every 1 minut
+   }).forEach({ mm : 2 }, function (rt, ms) {
+      // every 2 minues
+   }).forEach({ ss : 1 }, function (rt, ms) {
+      // every 1 second
+   }).forEach({ hh : 100 }, function (rt, ms) {       
+      // every 100 hours
+   }).onStart(function (rt, ms) {
+      // timer is started
+   }).onStop(function (rt, ms) {   
+      // timer is stopped
+   }).onExtend(function (rt, ms) {
+      // timer is extended
+   }).onClear(function (rt, ms) {   
+      // timer is cleared
+   }).start();
+   ```
+ 
+   Unlimited time intervals and event hooks may be added. Overlapping intervals are handled with rock stability. A brevity of syntax needed means less overhead for managing part of your application that using rocktimer.
 
 
 ---------------------------------------------------------
-
 #### <a id="license">License:
 
 (The MIT License)

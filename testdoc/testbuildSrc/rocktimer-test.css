@@ -1,0 +1,69 @@
+body {
+    margin:0;
+}
+
+.timer a {
+    display:inline-block;
+    text-decoration:none;
+    background-color:#faa;
+    color:#000;
+}
+.timer a:visited {
+    color:#000;
+}
+.timer a:hover {
+    color:blue;
+}
+
+.timer a span {
+    display:inline-block;
+    text-align:center;
+    margin:10px 0;
+    width:100px;
+}
+.timer .timer-controls {
+    display:inline-block;
+    vertical-align:top;
+    margin:0;padding:0;
+    list-style:none;
+}
+.timer .timer-controls-control {
+    margin:5px 0;
+    font-size:20px;
+}
+.timer .timer-display {
+    display:inline-block;
+    vertical-align:top;
+    margin:5px;
+    font-size:43px;
+}
+.timer .timer-display-status {
+    background-color:#faa;
+}
+.timer .timer-display-status-label {
+    margin:5px;
+    display:inline-block;
+    font-size:24px;
+}
+.timer .timer-display-list {
+    margin:0;
+    padding:0;
+    list-style:none;
+}
+.timer .timer-display-list-item {
+    display:inline-block;
+    min-width:110px;
+}
+.timer .timer-display-list-item + .timer-display-list-item + .timer-display-list-item {
+    min-width:140px;
+}
+.timer .timer-display-list-item-label {
+    display:inline-block;
+    margin:10px 15px;
+}
+.timer .timer-display-list-labels {
+    background-color:#aaf;
+}
+.timer .timer-display-list-content {
+    background-color:#afa;
+}

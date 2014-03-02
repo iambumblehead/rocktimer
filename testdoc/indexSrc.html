@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+
+    <title>rocktimer test</title>
+    <!-- <scrounge type=".css" trees="rocktimer-test.js"> -->
+    <!-- </scrounge> -->
+
+    <!-- <scrounge type=".js" trees="rocktimer-test.js"> -->
+    <!-- </scrounge> -->
+  </head>
+
+  <body>
+    <div class="timer">
+      <ul class="timer-controls">
+        <li class="timer-controls-control">
+          <a href="#" id="Start">
+            <span>Start</span>
+          </a>
+        </li>
+        <li class="timer-controls-control">
+          <a href="#" id="Stop">
+            <span>Stop</span>
+          </a>
+        </li>
+        <li class="timer-controls-control">
+          <a href="#" id="Clear">
+            <span>Clear</span>
+          </a>
+        </li>
+        <li class="timer-controls-control">
+          <a href="#" id="Extend">
+            <span>Extend</span>
+          </a>
+        </li>
+      </ul>
+
+      <div class="timer-display">
+        <ul class="timer-display-list timer-display-list-labels">
+          <li class="timer-display-list-item">
+            <span class="timer-display-list-item-label">mm</span>
+          </li>
+          <li class="timer-display-list-item">
+            <span class="timer-display-list-item-label">ss</span>
+          </li>
+          <li class="timer-display-list-item">
+            <span class="timer-display-list-item-label">ms</span>
+          </li>
+          <li class="timer-display-list-item">
+            <span class="timer-display-list-item-label">cdown (ss)</span>
+          </li>
+        </ul>
+
+        <ul class="timer-display-list timer-display-list-content">
+          <li class="timer-display-list-item">
+            <span id="LabelA" class="timer-display-list-item-label">0</span>
+          </li>
+          <li class="timer-display-list-item">
+            <span id="LabelB" class="timer-display-list-item-label">0</span>
+          </li>
+          <li class="timer-display-list-item">
+            <span id="LabelC" class="timer-display-list-item-label">0</span>
+          </li>
+          <li class="timer-display-list-item">
+            <span id="LabelD" class="timer-display-list-item-label">0</span>
+          </li>
+        </ul>
+        <div class="timer-display-status">
+          <span id="LabelStatus" class="timer-display-status-label">
+        </div>
+      </div>
+    </div>
+
+    <script type="text/javascript">
+      rocktimerTest.init();
+    </script>
+
+  </body>
+</html>
