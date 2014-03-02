@@ -285,6 +285,8 @@ Create a timer. Start it. Stop it.
 ---------------------------------------------------------
 #### <a id="license">License:
 
+ ![scrounge](http://github.com/iambumblehead/scroungejs/raw/master/img/hand.png) 
+
 (The MIT License)
 
 Copyright (c) 2013 [Bumblehead][0] <chris@bumblehead.com>
