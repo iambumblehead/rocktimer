@@ -217,3 +217,29 @@ describe("rocktimerObj.extend", function () {
   });
 
 });
+
+
+describe("rocktimerObj", function () {
+  it("with a time of 9mm, should start at 0mm", function (done) {
+
+    rocktimer({
+      mm : 9
+    }).onStart(function (rt, ms) {
+      expect(ms.asmm() === 0).toBe( true );
+      done();
+      rt.stop();
+    }).start();
+
+  });
+
+  it("with a time of 9mm, should start with time remaining 9mm", function (done) {
+    rocktimer({
+      mm : 9
+    }).onStart(function (rt, ms) {
+      expect(ms.remaining.asmm() === 9).toBe( true );
+      done();
+      rt.stop();
+    }).start();
+  });
+
+});

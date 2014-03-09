@@ -1,5 +1,5 @@
 // Filename: rocktimer-test.js
-// Timestamp: 2014.03.02-14:48:25 (last modified)  
+// Timestamp: 2014.03.09-11:57:22 (last modified)  
 // Author(s): Bumblehead (www.bumblehead.com)
 // Requires: rocktimer.js
 
@@ -52,15 +52,15 @@ var rocktimerTest = {
 
     return rocktimer({
       hh : 0,
-      mm : 5,
-      ss : 2,
-      ms : 100
+      mm : 0,
+      ss : 5,
+      ms : 0
     }).forEach({ mm : 1 }, function (rt, ms) {
       that.setLabelMin(ms.asmm());
     }).forEach({ ss : 1 }, function (rt, ms) {
       that.setLabelSec(ms.asss());
     }).forEach({ ms : 100 }, function (rt, ms) {
-      that.setLabelCountdown(ms.remaining.asss());
+      that.setLabelCountdown(ms.remaining);
       that.setLabelMs(ms);
     }).onStart(function (rt, ms) {
       that.setLabelMin(ms.asmm());
@@ -69,7 +69,6 @@ var rocktimerTest = {
       that.setLabelCountdown(ms.remaining.asss());
       that.setLabelStatus('Start.');
     }).onStop(function (rt, ms) {
-      console.log('stop');
       that.setLabelStatus('Stop, time remaining (ms): ' + ms.remaining);
     }).onExtend(function (rt, ms) {
       that.setLabelCountdown(ms.remaining.asss());
