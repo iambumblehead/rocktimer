@@ -1,5 +1,5 @@
 // Filename: rocktimer-test.js
-// Timestamp: 2014.03.09-11:57:22 (last modified)  
+// Timestamp: 2014.03.09-17:08:14 (last modified)  
 // Author(s): Bumblehead (www.bumblehead.com)
 // Requires: rocktimer.js
 
@@ -48,50 +48,77 @@ var rocktimerTest = {
   },
 
   getTimer : function () {
-    var that = this;
+    var that = this, rock;
+
+    /*
+    return rocktimer({
+      mm : 3
+    }).onStart(function (ms) {
+      console.log(ms.ashh());
+      console.log(ms.asmm());
+      console.log(ms.asss());
+      console.log(ms.asms());     
+      console.log(ms.remaining.ashh());
+      console.log(ms.remaining.asmm());
+      console.log(ms.remaining.asss());     
+      console.log(ms.remaining.asms());          
+    }).start();
+     */
+
+    /*
+    return rock = rocktimer({
+      mm : 3
+    }).onStart(function (ms) {
+      that.setLabelSec(ms.remaining.asss());
+      that.setLabelMin(ms.remaining.asmm());
+    }).onClear(function (ms) {
+      that.setLabelSec(ms.remaining.asss());
+      that.setLabelMin(ms.remaining.asmm());
+    }).forEach({ ss : 1 }, function (ms) {
+      that.setLabelMin(ms.remaining.asmm());
+      that.setLabelSec(ms.remaining.asss());
+    }).forEach({ mm : 1 }, function (ms) {
+      that.setLabelMin(ms.remaining.asmm());
+      if (ms.remaining.asmm() == 2) {      
+        rock.stop().forEach({ ms : 100 }, function (ms) {
+          if (ms.remaining.asms() <= 60000) {
+            that.setLabelMs(ms.remaining.asms());
+          }
+        }).start();
+      }
+    });
+     */
 
     return rocktimer({
       hh : 0,
       mm : 0,
       ss : 5,
       ms : 0
-    }).forEach({ mm : 1 }, function (rt, ms) {
+    }).forEach({ mm : 1 }, function (ms) {
       that.setLabelMin(ms.asmm());
-    }).forEach({ ss : 1 }, function (rt, ms) {
+    }).forEach({ ss : 1 }, function (ms) {
       that.setLabelSec(ms.asss());
-    }).forEach({ ms : 100 }, function (rt, ms) {
-      that.setLabelCountdown(ms.remaining);
-      that.setLabelMs(ms);
-    }).onStart(function (rt, ms) {
+    }).forEach({ ms : 100 }, function (ms) {
+      that.setLabelCountdown(ms.remaining.asms());
+      that.setLabelMs(ms.asms());
+    }).onStart(function (ms) {
       that.setLabelMin(ms.asmm());
       that.setLabelSec(ms.asss());
-      that.setLabelMs(ms);
+      that.setLabelMs(ms.asms());
       that.setLabelCountdown(ms.remaining.asss());
       that.setLabelStatus('Start.');
-    }).onStop(function (rt, ms) {
-      that.setLabelStatus('Stop, time remaining (ms): ' + ms.remaining);
-    }).onExtend(function (rt, ms) {
+    }).onStop(function (ms) {
+      that.setLabelStatus('Stop, time remaining (ms): ' + ms.remaining.asms());
+    }).onExtend(function (ms) {
       that.setLabelCountdown(ms.remaining.asss());
       that.setLabelStatus('Extended, time remaining (ms): ' + ms.mstotal);
-    }).onClear(function (rt, ms) {
+    }).onClear(function (ms) {
       that.setLabelMin(ms.asmm());
       that.setLabelSec(ms.asss());
-      that.setLabelMs(ms);
+      that.setLabelMs(ms.asms());
       that.setLabelCountdown(ms.remaining.asss());
       that.setLabelStatus('Clear.');
     });
-  },
-
-  stop : function (rock) {
-    rock.stop();
-  },
-
-  clear : function (rock) {
-    rock.clear();
-  },
-
-  start : function (rock) {
-    rock.start();
   },
 
   init : function () {
@@ -100,6 +127,7 @@ var rocktimerTest = {
         startElem = document.getElementById('Start'),
         stopElem = document.getElementById('Stop'),
         clearElem = document.getElementById('Clear'),
+        resetElem = document.getElementById('Reset'),
         extendElem = document.getElementById('Extend');
 
     startElem.onclick = function (e) {
@@ -115,6 +143,11 @@ var rocktimerTest = {
     clearElem.onclick = function (e) {
       e.preventDefault();
       rock.clear();
+    };
+
+    resetElem.onclick = function (e) {
+      e.preventDefault();
+      rock.reset();
     };
 
     extendElem.onclick = function (e) {

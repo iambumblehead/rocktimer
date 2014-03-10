@@ -14,34 +14,33 @@ A demo timer/countdown application is included in the tests. To build the test d
 
  * **Easy (constructor used by demo app)**: 
    ```
-   return rocktimer({
+   rocktimer({
        hh : 0,
-       mm : 5,
-       ss : 2,
-       ms : 100
-   }).forEach({ mm : 1 }, function (rt, ms) {
+       mm : 0,
+       ss : 5,
+       ms : 0
+   }).forEach({ mm : 1 }, function (ms) {
        that.setLabelMin(ms.asmm());
-   }).forEach({ ss : 1 }, function (rt, ms) {
+   }).forEach({ ss : 1 }, function (ms) {
        that.setLabelSec(ms.asss());
-   }).forEach({ ms : 100 }, function (rt, ms) {
-       that.setLabelCountdown(ms.remaining.asss());
-       that.setLabelMs(ms);
-   }).onStart(function (rt, ms) {
+   }).forEach({ ms : 100 }, function (ms) {
+       that.setLabelCountdown(ms.remaining.asms());
+       that.setLabelMs(ms.asms());
+   }).onStart(function (ms) {
        that.setLabelMin(ms.asmm());
        that.setLabelSec(ms.asss());
-       that.setLabelMs(ms);
+       that.setLabelMs(ms.asms());
        that.setLabelCountdown(ms.remaining.asss());
        that.setLabelStatus('Start.');
-   }).onStop(function (rt, ms) {
-       console.log('stop');
-       that.setLabelStatus('Stop, time remaining (ms): ' + ms.remaining);
-   }).onExtend(function (rt, ms) {
+   }).onStop(function (ms) {
+       that.setLabelStatus('Stop, time remaining (ms): ' + ms.remaining.asms());
+   }).onExtend(function (ms) {
        that.setLabelCountdown(ms.remaining.asss());
        that.setLabelStatus('Extended, time remaining (ms): ' + ms.mstotal);
-   }).onClear(function (rt, ms) {
+   }).onClear(function (ms) {
        that.setLabelMin(ms.asmm());
        that.setLabelSec(ms.asss());
-       that.setLabelMs(ms);
+       that.setLabelMs(ms.asms());
        that.setLabelCountdown(ms.remaining.asss());
        that.setLabelStatus('Clear.');
    });   
@@ -57,26 +56,26 @@ A demo timer/countdown application is included in the tests. To build the test d
 **The `forEach` method and event hooks are what make `rocktimer` really useful.**
 
 ```javascript
-var rock = rocktimer({
+rocktimer({
     hh : 0,
     mm : 0,
     ss : 1,
     ms : 100
-}).forEach({ mm : 1 }, function (rt, ms) {
-   // every 1 minut
-}).forEach({ mm : 2 }, function (rt, ms) {
+}).forEach({ mm : 1 }, function (ms) {
+   // every 1 minute
+}).forEach({ mm : 2 }, function (ms) {
    // every 2 minues
-}).forEach({ ss : 1 }, function (rt, ms) {
+}).forEach({ ss : 1 }, function (ms) {
    // every 1 second
-}).forEach({ hh : 100 }, function (rt, ms) {       
+}).forEach({ hh : 100 }, function (ms) {       
    // every 100 hours
-}).onStart(function (rt, ms) {
+}).onStart(function (ms) {
    // timer is started
-}).onStop(function (rt, ms) {   
+}).onStop(function (ms) {   
    // timer is stopped
-}).onExtend(function (rt, ms) {
+}).onExtend(function (ms) {
    // timer is extended
-}).onClear(function (rt, ms) {   
+}).onClear(function (ms) {   
    // timer is cleared
 }).start();
 ```
@@ -130,12 +129,74 @@ Create a timer. Start it. Stop it.
 
  ```javascript
  rocktimer({
-   hh : 0,
-   mm : 0,
-   ss : 1,
-   ms : 100
+     hh : 0,
+     mm : 0,
+     ss : 1,
+     ms : 100
  }).start().stop();
  ```
+ 
+`rocktimer` uses only the shortest time interval needed to support any callbacks given. Creates a time interval of 1 hour:
+ ```javascript
+ rocktimer({
+     hh : 1
+ }).forEach({hh : 1}, function (ms) {
+     console.log(ms);
+ });
+ ```
+ 
+Creates a time interval of 200 milliseconds:
+ ```javascript
+ rocktimer({
+     hh : 1
+ }).forEach({ms : 200}, function (ms) {
+     console.log(ms.asms());
+ });
+ ``` 
+ 
+Longer time intervals are more accurate. You may modify the time intervals dynamically. Update a 10 minute timer to use a 1 second interval during the final minute:
+
+ ```
+ var rock = rocktimer({
+     mm : 3
+ }).onStart(function (ms) {
+     that.setLabelSec(ms.remaining.asss());
+     that.setLabelMin(ms.remaining.asmm());
+ }).onClear(function (ms) {
+     that.setLabelSec(ms.remaining.asss());
+     that.setLabelMin(ms.remaining.asmm());
+ }).forEach({ ss : 1 }, function (ms) {
+     that.setLabelMin(ms.remaining.asmm());
+     that.setLabelSec(ms.remaining.asss());
+ }).forEach({ mm : 1 }, function (ms) {
+     that.setLabelMin(ms.remaining.asmm());
+     if (ms.remaining.asmm() == 2) {      
+         rock.stop().forEach({ ms : 100 }, function (ms) {
+            if (ms.remaining.asms() <= 60000) {
+                that.setLabelMs(ms.remaining.asms());
+            }
+         }).start();
+     }
+ }); 
+ ```
+ 
+Each callback added to the timer gets an 'ms' objects as the first parameter. The object holds data describing the time at which the callback is expected:
+
+ ```javascript
+ var rock = rocktimer({
+     mm : 3
+ }).onStart(function (ms) {
+     ms.ashh();           // 0
+     ms.asmm();           // 0
+     ms.asss();           // 0
+     ms.asms();           // 0
+     ms.remaining.ashh(); // 0
+     ms.remaining.asmm(); // 3
+     ms.remaining.asss(); // 180
+     ms.remaining.asms(); // 180000
+ }).start()
+ ```
+
 
 ---------------------------------------------------------
 #### <a id="methods">METHODS:
@@ -145,7 +206,7 @@ Create a timer. Start it. Stop it.
    returns a timer object. timeOpts should be an object with property-names corresponding to unicode time values.
 
    ```javascript
-   var rocktimerObj = rocktimer({
+   rocktimer({
        hh : 1,  // 1 hour
        mm : 0,  // 0 minutes
        ss : 1,  // 1 second
@@ -157,7 +218,7 @@ Create a timer. Start it. Stop it.
    prototype is not a method but a property defined on the `rocktimer` namespace. the prototype is used by `rocktimer` to construct its own timer object. prototype may be accessed to redefine its default properties. Methods on the prototype include `start`, `stop`, `clear`, `reset`, `extend`, `isActive`, `getremainingms`.
 
 
- - **rocktimer.prototype.start ( _fn_ )**
+ - **rocktimer.prototype.start ( )**
 
    starts the timer.
 
@@ -187,9 +248,28 @@ Create a timer. Start it. Stop it.
    }).start().stop();
    ```
 
+ - **rocktimer.prototype.reset ( )**
+
+   Reset values. If timer was created for 5 minutes, timer will have 5 minutes remaining after reset(), no matter what its extended time may have been. Reset also stops and clears the timer.
+
+   ```javascript
+   var rock = rocktimer({
+       hh : 0,
+       mm : 0,
+       ss : 1,
+       ms : 100
+   }).onStop(function () {
+       console.log('~2100 milliseconds have passed');
+   }).start();
+   
+   setTimeout(function () {
+       rock.reset();
+   }, 1000)   
+   ```
+
  - **rocktimer.prototype.clear ( )**
 
-   Reset values. If timer was created for 5 minutes, timer will have 5 minutes remaining after reset().
+   Clears the timer to begins at 0. Extended times added to the timer remain on the timer.
 
    ```javascript
    var rock = rocktimer({
@@ -237,44 +317,32 @@ Create a timer. Start it. Stop it.
        .stop().isActive(); // false
    ```
 
- - **rocktimer.prototype.getramainingms ( )**
-
-   ```javascript
-   var rock = rocktimer({
-       hh : 0,
-       mm : 0,
-       ss : 1,
-       ms : 100
-   }).forEach({ ss : 1 }, function () {
-       console.log(rock.getremainingms()); // 0, 1
-   }).start();
-   ```
    
  - **rocktimer.prototype.forEach ( )** _and event hooks_   
  
    The `forEach` method and event hooks are what make `rocktimer` really useful.
 
    ```javascript
-   var rock = rocktimer({
+   rocktimer({
        hh : 0,
        mm : 0,
        ss : 1,
        ms : 100
-   }).forEach({ mm : 1 }, function (rt, ms) {
-      // every 1 minut
-   }).forEach({ mm : 2 }, function (rt, ms) {
+   }).forEach({ mm : 1 }, function (ms) {
+      // every 1 minute
+   }).forEach({ mm : 2 }, function (ms) {
       // every 2 minues
-   }).forEach({ ss : 1 }, function (rt, ms) {
+   }).forEach({ ss : 1 }, function (ms) {
       // every 1 second
-   }).forEach({ hh : 100 }, function (rt, ms) {       
+   }).forEach({ hh : 100 }, function (ms) {       
       // every 100 hours
-   }).onStart(function (rt, ms) {
+   }).onStart(function (ms) {
       // timer is started
-   }).onStop(function (rt, ms) {   
+   }).onStop(function (ms) {   
       // timer is stopped
-   }).onExtend(function (rt, ms) {
+   }).onExtend(function (ms) {
       // timer is extended
-   }).onClear(function (rt, ms) {   
+   }).onClear(function (ms) {   
       // timer is cleared
    }).start();
    ```

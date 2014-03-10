@@ -47,12 +47,12 @@ describe("rocktimerObj.start", function () {
 
   it("should start a timer that is reasonably accurate", function (done) {
 
-    rocktimer({
+    var rt = rocktimer({
       hh : 0,
       mm : 0,
       ss : 1,
       ms : 100
-    }).onStop(function (rt, ms) {
+    }).onStop(function (ms) {
       expect(isNear(Date.now() - rt.bgnDate.getTime(), 1100, 40)).toBe(true);
       done();
     }).start();
@@ -109,17 +109,19 @@ describe("rocktimerObj.clear", function () {
   it("should clear index timer properties", function (done) {
 
 
-    rocktimer({
+    var rt = rocktimer({
       hh : 0,
       mm : 0,
       ss : 1,
       ms : 100
-    }).onClear(function (rt, ms) {
-
+    }).onClear(function (ms) {
+    
       expect(rt.frameindex).toBe(0);
       done();
 
-    }).start().clear().stop();    
+    }).stop();    
+
+    rt.clear().stop();
 
   });
 });
@@ -222,24 +224,29 @@ describe("rocktimerObj.extend", function () {
 describe("rocktimerObj", function () {
   it("with a time of 9mm, should start at 0mm", function (done) {
 
-    rocktimer({
+    var rt = rocktimer({
       mm : 9
-    }).onStart(function (rt, ms) {
+    }).onStart(function (ms) {
       expect(ms.asmm() === 0).toBe( true );
       done();
       rt.stop();
-    }).start();
+    });
+
+    rt.start();
 
   });
 
   it("with a time of 9mm, should start with time remaining 9mm", function (done) {
-    rocktimer({
+    var rt = rocktimer({
       mm : 9
-    }).onStart(function (rt, ms) {
+    }).onStart(function (ms) {
       expect(ms.remaining.asmm() === 9).toBe( true );
       done();
       rt.stop();
-    }).start();
+    });
+
+    rt.start();
   });
 
 });
+
