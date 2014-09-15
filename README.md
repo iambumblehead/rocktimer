@@ -353,7 +353,7 @@ Each callback added to the timer gets an 'ms' objects as the first parameter. Th
 ---------------------------------------------------------
 #### <a id="license">License:
 
- ![scrounge](http://github.com/iambumblehead/scroungejs/raw/master/img/hand.png) 
+ ![scrounge](https://github.com/iambumblehead/scroungejs/raw/master/img/hand.png) 
 
 (The MIT License)
 
