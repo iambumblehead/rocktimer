@@ -1,5 +1,5 @@
 // Filename: rocktimer.js
-// Timestamp: 2015.12.20-00:54:43 (last modified)
+// Timestamp: 2015.12.20-01:14:44 (last modified)
 // Author(s): Bumblehead (www.bumblehead.com)
 
 var rocktimerframes = require('./lib/rocktimerframes'),
@@ -247,10 +247,10 @@ var rocktimer = module.exports = (function (p) {
   p = function (opts) {
     var that = Object.create(timer);
 
-    that.onClearHook = eventhook.getNew();
-    that.onStartHook = eventhook.getNew();
-    that.onStopHook = eventhook.getNew();
-    that.onExtendHook = eventhook.getNew();
+    that.onClearHook = eventhook();
+    that.onStartHook = eventhook();
+    that.onStopHook = eventhook();
+    that.onExtendHook = eventhook();
 
     that.bgnDate = new Date();
     that.frameindex = 0;

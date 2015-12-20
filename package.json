@@ -1,7 +1,7 @@
 {
   "name": "rocktimer",
   "main": "rocktimer",  
-  "version": "0.2.1",
+  "version": "0.2.2",
   "readmeFilename": "README.md",
   "description": "A timer. Add callbacks to the finish event. Easily start/stop and extend the time.",
   "repository": {
