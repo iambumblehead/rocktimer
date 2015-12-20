@@ -1,14 +1,12 @@
 // Filename: rocktimer.js
-// Timestamp: 2014.03.09-16:55:27 (last modified)  
+// Timestamp: 2015.12.20-00:54:43 (last modified)
 // Author(s): Bumblehead (www.bumblehead.com)
-// Requires: rocktimerframes.js, rocktimerms.js, eventhook.js
 
 var rocktimerframes = require('./lib/rocktimerframes'),
     rocktimerms = require('./lib/rocktimerms'),
     eventhook = require('eventhook');
 
-var rocktimer = 
-  ((typeof module === 'object') ? module : {}).exports = (function (p) {
+var rocktimer = module.exports = (function (p) {
 
   var timer = {
     timer : null,
